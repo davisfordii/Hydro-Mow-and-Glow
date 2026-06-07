@@ -1117,47 +1117,53 @@
       <div class="contact-form-card">
         <div class="form-title">Get Your Free Quote</div>
         <p class="form-sub">Fill out the form and we'll get back to you ASAP.</p>
-        <form>
+        <div id="form-success" style="display:none;background:linear-gradient(135deg,rgba(0,200,255,0.12),rgba(26,111,219,0.12));border:1.5px solid rgba(0,200,255,0.35);border-radius:12px;padding:20px 24px;color:#0d2b5e;font-weight:600;font-size:15px;margin-bottom:24px;">
+          ✅ Request sent! We'll be in touch within a few hours.
+        </div>
+        <div id="form-error" style="display:none;background:rgba(220,53,69,0.08);border:1.5px solid rgba(220,53,69,0.3);border-radius:12px;padding:20px 24px;color:#842029;font-weight:600;font-size:15px;margin-bottom:24px;">
+          Something went wrong. Please call us at <a href="tel:+15863472067" style="color:#842029">(586) 347-2067</a>.
+        </div>
+        <form id="quoteForm">
           <div class="form-row">
             <div class="form-group">
-              <label class="form-label">First Name</label>
-              <input type="text" class="form-input" placeholder="John" />
+              <label class="form-label" for="firstName">First Name</label>
+              <input type="text" id="firstName" name="firstName" class="form-input" placeholder="John" required />
             </div>
             <div class="form-group">
-              <label class="form-label">Last Name</label>
-              <input type="text" class="form-input" placeholder="Doe" />
+              <label class="form-label" for="lastName">Last Name</label>
+              <input type="text" id="lastName" name="lastName" class="form-input" placeholder="Doe" required />
             </div>
           </div>
           <div class="form-row">
             <div class="form-group">
-              <label class="form-label">Phone</label>
-              <input type="tel" class="form-input" placeholder="(555) 000-0000" />
+              <label class="form-label" for="phone">Phone</label>
+              <input type="tel" id="phone" name="phone" class="form-input" placeholder="(555) 000-0000" required />
             </div>
             <div class="form-group">
-              <label class="form-label">Email</label>
-              <input type="email" class="form-input" placeholder="you@email.com" />
+              <label class="form-label" for="email">Email</label>
+              <input type="email" id="email" name="email" class="form-input" placeholder="you@email.com" required />
             </div>
           </div>
           <div class="form-group">
-            <label class="form-label">Service Needed</label>
-            <select class="form-select">
+            <label class="form-label" for="service">Service Needed</label>
+            <select id="service" name="service" class="form-select" required>
               <option value="">Select a service…</option>
               <option>House Washing</option>
-              <option>Driveway & Concrete</option>
-              <option>Deck & Fence Wash</option>
-              <option>Lawn & Landscape</option>
+              <option>Driveway &amp; Concrete</option>
+              <option>Deck &amp; Fence Wash</option>
+              <option>Lawn &amp; Landscape</option>
               <option>Other / Multiple Services</option>
             </select>
           </div>
           <div class="form-group">
-            <label class="form-label">Address / Location</label>
-            <input type="text" class="form-input" placeholder="123 Main St, Your City" />
+            <label class="form-label" for="address">Address / Location</label>
+            <input type="text" id="address" name="address" class="form-input" placeholder="123 Main St, Your City" required />
           </div>
           <div class="form-group">
-            <label class="form-label">Message (optional)</label>
-            <textarea class="form-textarea" placeholder="Tell us a bit about what you need…"></textarea>
+            <label class="form-label" for="message">Message (optional)</label>
+            <textarea id="message" name="message" class="form-textarea" placeholder="Tell us a bit about what you need…"></textarea>
           </div>
-          <button type="submit" class="form-submit">Send My Request →</button>
+          <button type="submit" class="form-submit" id="submitBtn">Send My Request →</button>
         </form>
       </div>
     </div>
@@ -1205,5 +1211,47 @@
     </div>
   </footer>
 
+  <script>
+    document.getElementById('quoteForm').addEventListener('submit', async function (e) {
+      e.preventDefault();
+      const btn = document.getElementById('submitBtn');
+      const successMsg = document.getElementById('form-success');
+      const errorMsg = document.getElementById('form-error');
+
+      btn.disabled = true;
+      btn.textContent = 'Sending…';
+      successMsg.style.display = 'none';
+      errorMsg.style.display = 'none';
+
+      const data = {
+        firstName: document.getElementById('firstName').value.trim(),
+        lastName:  document.getElementById('lastName').value.trim(),
+        phone:     document.getElementById('phone').value.trim(),
+        email:     document.getElementById('email').value.trim(),
+        service:   document.getElementById('service').value,
+        address:   document.getElementById('address').value.trim(),
+        message:   document.getElementById('message').value.trim(),
+      };
+
+      try {
+        const res = await fetch('/api/quote', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data),
+        });
+        if (res.ok) {
+          successMsg.style.display = 'block';
+          this.reset();
+        } else {
+          errorMsg.style.display = 'block';
+        }
+      } catch (_) {
+        errorMsg.style.display = 'block';
+      }
+
+      btn.disabled = false;
+      btn.textContent = 'Send My Request →';
+    });
+  </script>
 </body>
 </html>
